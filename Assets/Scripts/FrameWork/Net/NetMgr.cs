@@ -13,10 +13,12 @@ public class NetMgr : MonoBehaviour
     public static NetMgr Instance => instance;
 
     private Socket socket;
+
     //发送消息的队列容器，主线程将消息放进容器内，发送线程从里取出
-    private Queue<string> sender = new Queue<string>();
+    private MessageSender sender;
+
     //接受消息的队列容器，接收线程往里放，主线程取出
-    private Queue<string> receiver = new Queue<string>();
+    private MessageReceiver receiver;
 
     //用于接受消息
     private byte[] receiveBytes = new byte[1024 * 1024];
@@ -35,8 +37,8 @@ public class NetMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(receiver.Count>0)
-            print(receiver.Dequeue()); 
+        // if (receiver.Count > 0)
+
     }
 
     private void Init()
@@ -60,9 +62,9 @@ public class NetMgr : MonoBehaviour
             socket.Connect(ipPoint);
             isConnected = true;
             //开启发送线程
-            ThreadPool.QueueUserWorkItem(SendMsg);
+            sender = MessageSender.Instance.StartUp(socket);
             //开启接收线程
-            ThreadPool.QueueUserWorkItem(ReceiveMsg);
+            receiver = MessageReceiver.Instance.StartUp(socket);
         }
         catch (SocketException e)
         {
@@ -72,41 +74,16 @@ public class NetMgr : MonoBehaviour
                 print("连接失败" + e.ErrorCode + e.Message);
         }
     }
-    
+
     //发送消息
-    public void Send(string info)
+    public void Send(byte[] bytes)
     {
-        sender.Enqueue(info);
-    }
-
-    private void SendMsg(object obj)
-    {
-        while (isConnected)
-        {
-            if (sender.Count > 0)
-            {
-                socket.Send(Encoding.UTF8.GetBytes(sender.Dequeue()));
-            }
-        }
-    }
-
-    //不停的接受消息
-    private void ReceiveMsg(object obj)
-    {
-        while (isConnected)
-        {
-            if(socket.Available > 0)
-            {
-                receiveNum = socket.Receive(receiveBytes);
-                //收到消息 解析消息为字符串 并放入公共容器
-                receiver.Enqueue(Encoding.UTF8.GetString(receiveBytes, 0, receiveNum));
-            }    
-        }
+        sender.SendMessage(bytes);
     }
     
     public void Close()
     {
-        if(socket != null)
+        if (socket != null)
         {
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
@@ -119,4 +96,5 @@ public class NetMgr : MonoBehaviour
     {
         Close();
     }
+    
 }

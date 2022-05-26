@@ -7,12 +7,18 @@ public abstract class BaseSerialized
     /// 获取序列化字节数组
     /// </summary>
     public abstract byte[] GetBytes();
-    
+
     /// <summary>
     /// 获取序列化后的长度
     /// </summary>
     /// <returns></returns>
     public abstract int GetLength();
+
+    /// <summary>
+    /// 子类必须重写，用于返回一个专属的ID以反序列化时区别类信息
+    /// </summary>
+    /// <returns></returns>
+    public abstract int GetID();
 
     /// <summary>
     /// 反序列化规则
@@ -22,10 +28,29 @@ public abstract class BaseSerialized
     /// <returns>当类嵌套时，通过该返回值确定当前读取类的读取字节长度</returns>
     public abstract int Reading(byte[] bytes, int beginIndex = 0);
 
+    /// <summary>
+    /// 添加基础类型的头信息
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="index"></param>
+    /// <param name="type"></param>
     public void AddHeader(byte[] bytes, ref int index, EnumSimpleValue type)
     {
         //添加头信息
         BitConverter.GetBytes((int) type).CopyTo(bytes, index);
+        index += 4;
+    }
+    
+    /// <summary>
+    /// 用于添加引用类型的头信息
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="index"></param>
+    /// <param name="ID"></param>
+    public void AddHeader(byte[] bytes, ref int index, int ID)
+    {
+        //添加头信息
+        BitConverter.GetBytes(ID).CopyTo(bytes, index);
         index += 4;
     }
 
@@ -42,13 +67,18 @@ public abstract class BaseSerialized
         return (EnumSimpleValue) header;
     }
 
-    public void Write(byte[] bytes, object value, ref int index)
+    /// <summary>
+    /// 序列化基础类型以及字符串
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="value"></param>
+    /// <param name="index"></param>
+    public void Serialized(byte[] bytes, object value, ref int index)
     {
         if (value is byte)
         {
             //添加头信息
             AddHeader(bytes, ref index, EnumSimpleValue.Byte);
-
             bytes[index] = (byte) value;
             index += 1;
             return;
@@ -99,15 +129,13 @@ public abstract class BaseSerialized
         index += len;
     }
 
-    public void Write<T>(byte[] bytes, T data, ref int index) where T : BaseSerialized
-    {
-        AddHeader(bytes, ref index, EnumSimpleValue.Custom);
-        byte[] dataBytes = data.GetBytes();
-        dataBytes.CopyTo(bytes, index);
-        index += dataBytes.Length;
-    }
-
-    public object Read(byte[] bytes, ref int index)
+    /// <summary>
+    /// 反序列化基本类型
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    public object DeSerialized(byte[] bytes, ref int index)
     {
         EnumSimpleValue simpleValue = ParseHeader(bytes, ref index);
 
@@ -145,10 +173,33 @@ public abstract class BaseSerialized
         return null;
     }
 
-    public T Read<T>(byte[] bytes, ref int index) where T : BaseSerialized, new()
+    /// <summary>
+    /// 序列化引用类型
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="data"></param>
+    /// <param name="index"></param>
+    /// <typeparam name="T">传入的类型</typeparam>
+    public void Serialized<T>(byte[] bytes, T data, ref int index) where T : BaseSerialized
+    {
+        AddHeader(bytes, ref index, data.GetID());
+        byte[] dataBytes = data.GetBytes();
+        dataBytes.CopyTo(bytes, index);
+        index += dataBytes.Length;
+    }
+
+
+    /// <summary>
+    /// 反序列化引用类型
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="index"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T DeSerialized<T>(byte[] bytes, ref int index) where T : BaseSerialized, new()
     {
         T obj = new T();
-        index += 4; //去掉头信息
+        index += 4; //去掉代表类型的ID头信息
         index += obj.Reading(bytes, index);
         return obj;
     }
@@ -161,6 +212,5 @@ public enum EnumSimpleValue
     Byte = 2,
     Short = 3,
     Int = 4,
-    String = 5,
-    Custom = 6,
+    String = 5
 }
