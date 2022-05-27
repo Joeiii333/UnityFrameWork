@@ -79,7 +79,7 @@ public class MessageReceiver
                 nowIndex += 4;
 
                 //解析数据data
-                var data = ParseClassByID(cacheBytes, nowIndex, msg.classID);
+                msg.messageData = ParseClassByID(cacheBytes, nowIndex, msg.classID);
 
                 //如果消息体完整且成功解析，加入队列
                 if (!msg.IsEmpty())
@@ -88,7 +88,7 @@ public class MessageReceiver
                     nowIndex += msg.messageData.GetLength();
                 }
                 else
-                    nowIndex -= 4;    //如果消息体解析失败，索引回退
+                    nowIndex -= 4; //如果消息体解析失败，索引回退
 
                 //正好解析完
                 if (nowIndex == cacheLength)
@@ -117,7 +117,7 @@ public class MessageReceiver
         {
             case 1000:
                 Person p = new Person();
-                p.Reading(cacheBytes, nowIndex);
+                p.Reading(bytes, nowIndex);
                 return p;
             default:
                 //解析失败

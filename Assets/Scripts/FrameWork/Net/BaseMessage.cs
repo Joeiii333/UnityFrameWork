@@ -9,7 +9,10 @@ public class BaseMessage
     public int classID;
     public BaseSerialized messageData;
 
-    public BaseMessage(){}
+    public BaseMessage()
+    {
+    }
+
     public BaseMessage(BaseSerialized data)
     {
         messageData = data;
