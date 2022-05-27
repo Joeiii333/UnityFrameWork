@@ -15,7 +15,7 @@ public class MessageSender
 
     public static MessageSender Instance => instance;
 
-    private Queue<byte[]> sendQueue = new Queue<byte[]>();
+    public Queue<BaseMessage> sendQueue = new Queue<BaseMessage>();
     
     public MessageSender StartUp(Socket socket)
     {
@@ -32,13 +32,13 @@ public class MessageSender
         {
             if (sendQueue.Count > 0)
             {
-                // socket.Send();
+                socket.Send(sendQueue.Dequeue().GetMessagePacket());
             }
         }
     }
 
-    public void SendMessage(byte[] bytes)
+    public void SendMessage(BaseMessage msg)
     {
-        sendQueue.Enqueue(bytes);
+        sendQueue.Enqueue(msg);
     }
 }

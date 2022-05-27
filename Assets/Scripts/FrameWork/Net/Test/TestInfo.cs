@@ -13,16 +13,9 @@ public class TestInfo : MonoBehaviour
         p.sex = false;
         p.info = new PlayerInfo();
         p.info.lv = 99;
-        byte[] sourceByte = p.GetBytes();
-
-        int index = 0;
-        Person p2 = new Person();
-        p2.Reading(sourceByte);
-        print(p2.age);
-        print(p2.name);
-        print(p2.id);
-        print(p2.sex);
-        print(p2.info.lv);
+        // byte[] sourceByte = p.GetBytes();
+        BaseMessage message = new BaseMessage(p);
+        NetMgr.Instance.Send(message);
     }
 }
 
@@ -44,7 +37,7 @@ public class Person : BaseSerialized
                sizeof(short) +
                sizeof(bool) +
                info.GetLength() +
-               sizeof(int) * 6; //5个属性的协议头+1个自己本身的协议头
+               sizeof(int) * 5; //5个属性的协议头
     }
 
     public override int GetID()
@@ -66,8 +59,7 @@ public class Person : BaseSerialized
     public override byte[] GetBytes()
     {
         int index = 0;
-        byte[] bytes = new byte[GetLength()];    
-        Serialized(bytes, GetID(), ref index);     //加入自己本身的类型的标识ID
+        byte[] bytes = new byte[GetLength()];
         Serialized(bytes, age, ref index);
         Serialized(bytes, name, ref index);
         Serialized(bytes, id, ref index);
@@ -85,7 +77,6 @@ public class PlayerInfo : BaseSerialized
     {
         int index = 0;
         byte[] bytes = new byte[GetLength()];
-        Serialized(bytes, GetID(), ref index);    //加入自己本身的类型的标识ID
         Serialized(bytes, lv, ref index);
         return bytes;
     }
@@ -93,7 +84,7 @@ public class PlayerInfo : BaseSerialized
     public override int GetLength()
     {
         return sizeof(int) +
-               sizeof(int) * 2; //字段协议头+GetID的协议头 
+               sizeof(int) * 1; //字段协议头+GetID的协议头 
     }
 
     public override int GetID()

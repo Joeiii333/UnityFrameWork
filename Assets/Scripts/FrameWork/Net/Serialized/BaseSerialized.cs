@@ -29,7 +29,7 @@ public abstract class BaseSerialized
     public abstract int Reading(byte[] bytes, int beginIndex = 0);
 
     /// <summary>
-    /// 添加基础类型的头信息
+    /// 添加基础类型的头信息，这里的头信息只用来方便区分基础类型，对于引用类型使用泛型进行区分。
     /// </summary>
     /// <param name="bytes"></param>
     /// <param name="index"></param>
@@ -41,19 +41,6 @@ public abstract class BaseSerialized
         index += 4;
     }
     
-    /// <summary>
-    /// 用于添加引用类型的头信息
-    /// </summary>
-    /// <param name="bytes"></param>
-    /// <param name="index"></param>
-    /// <param name="ID"></param>
-    public void AddHeader(byte[] bytes, ref int index, int ID)
-    {
-        //添加头信息
-        BitConverter.GetBytes(ID).CopyTo(bytes, index);
-        index += 4;
-    }
-
     /// <summary>
     /// 解析头信息
     /// </summary>
@@ -182,7 +169,6 @@ public abstract class BaseSerialized
     /// <typeparam name="T">传入的类型</typeparam>
     public void Serialized<T>(byte[] bytes, T data, ref int index) where T : BaseSerialized
     {
-        AddHeader(bytes, ref index, data.GetID());
         byte[] dataBytes = data.GetBytes();
         dataBytes.CopyTo(bytes, index);
         index += dataBytes.Length;
@@ -199,7 +185,6 @@ public abstract class BaseSerialized
     public T DeSerialized<T>(byte[] bytes, ref int index) where T : BaseSerialized, new()
     {
         T obj = new T();
-        index += 4; //去掉代表类型的ID头信息
         index += obj.Reading(bytes, index);
         return obj;
     }

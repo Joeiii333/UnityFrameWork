@@ -37,8 +37,8 @@ public class NetMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if (receiver.Count > 0)
-
+        if (receiver.GetReceiverQueueCount() > 0)
+            receiver.ParseMessage();
     }
 
     private void Init()
@@ -76,11 +76,11 @@ public class NetMgr : MonoBehaviour
     }
 
     //发送消息
-    public void Send(byte[] bytes)
+    public void Send(BaseMessage msg)
     {
-        sender.SendMessage(bytes);
+        sender.SendMessage(msg);
     }
-    
+
     public void Close()
     {
         if (socket != null)
@@ -96,5 +96,10 @@ public class NetMgr : MonoBehaviour
     {
         Close();
     }
-    
+
+    public void ParseMessage(BaseMessage msg)
+    {
+        //msg中的数据已经解析完毕
+        //分发消息啊balabala..
+    }
 }
