@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
+using UnityEngine;
 
 public class MessageReceiver
 {
@@ -27,6 +27,9 @@ public class MessageReceiver
     {
         this.socket = socket;
         isConnected = true;
+        MonoBehaviour.print(socket.Connected);
+        MonoBehaviour.print(socket.RemoteEndPoint);
+
         //开启接受消息线程
         ThreadPool.QueueUserWorkItem(ReceiveMessage);
         return Instance;
@@ -38,6 +41,7 @@ public class MessageReceiver
         {
             if (socket.Available > 0)
             {
+                MonoBehaviour.print("收到消息");
                 byte[] receiveBytes = new byte[1024 * 1024]; //节省内存
                 int receiveLength = socket.Receive(receiveBytes);
                 //收到消息，先处理消息再放入容器中
@@ -88,7 +92,11 @@ public class MessageReceiver
                     nowIndex += msg.messageData.GetLength();
                 }
                 else
+                {
                     nowIndex -= 4; //如果消息体解析失败，索引回退
+                    break;
+                }
+
 
                 //正好解析完
                 if (nowIndex == cacheLength)
@@ -121,7 +129,7 @@ public class MessageReceiver
                 return p;
             default:
                 //解析失败
-                Console.WriteLine("处理数据解析失败，classID:{0}", classID);
+                MonoBehaviour.print("处理数据解析失败，classID:" + classID);
                 return null;
         }
     }

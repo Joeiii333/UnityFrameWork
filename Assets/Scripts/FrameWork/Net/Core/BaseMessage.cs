@@ -8,6 +8,7 @@ public class BaseMessage
     // public int messageLength;
     public int classID;
     public BaseSerialized messageData;
+    private int messageLength;
 
     public BaseMessage()
     {
@@ -27,10 +28,12 @@ public class BaseMessage
     public byte[] GetMessagePacket()
     {
         int index = 0;
-        byte[] bytes = new byte[messageData.GetLength() + 8];
+        int length = messageData.GetLength() + 8;            //因为后续还要加上classID和长度标识，所以需要+8；
+        messageLength = length;
+
+        byte[] bytes = new byte[length];
         byte[] data = messageData.GetBytes();
-        int length = messageData.GetLength() + 4;
-        //因为后续还要加上classID的长度，所以需要+4；
+        
         BitConverter.GetBytes(length).CopyTo(bytes, index);
         index += 4;
         BitConverter.GetBytes(classID).CopyTo(bytes, index);
@@ -42,5 +45,10 @@ public class BaseMessage
     public bool IsEmpty()
     {
         return classID == 0 || messageData == null;
+    }
+
+    public int GetMessageLength()
+    {
+        return messageLength;
     }
 }

@@ -37,7 +37,7 @@ public class NetMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (receiver.GetReceiverQueueCount() > 0)
+        if (isConnected && receiver.GetReceiverQueueCount() > 0)
             receiver.ParseMessage();
     }
 
@@ -61,6 +61,8 @@ public class NetMgr : MonoBehaviour
         {
             socket.Connect(ipPoint);
             isConnected = true;
+            print("连接成功");
+            Console.WriteLine("111");
             //开启发送线程
             sender = MessageSender.Instance.StartUp(socket);
             //开启接收线程
@@ -81,6 +83,12 @@ public class NetMgr : MonoBehaviour
         sender.SendMessage(msg);
     }
 
+    //用于测试，直接发送字节数组的方法
+    public void SendTest(byte[] bytes)
+    {
+        // sender.SendMessage();
+    }
+
     public void Close()
     {
         if (socket != null)
@@ -94,7 +102,8 @@ public class NetMgr : MonoBehaviour
 
     private void OnDestroy()
     {
-        Close();
+        if (isConnected)
+            Close();
     }
 
     public void ParseMessage(BaseMessage msg)
