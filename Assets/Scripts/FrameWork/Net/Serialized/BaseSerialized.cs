@@ -6,7 +6,7 @@ public abstract class BaseSerialized
     /// <summary>
     /// 获取序列化字节数组
     /// </summary>
-    public abstract byte[] GetBytes();
+    public abstract byte[] Writing();
 
     /// <summary>
     /// 获取序列化后的长度
@@ -169,7 +169,7 @@ public abstract class BaseSerialized
     /// <typeparam name="T">传入的类型</typeparam>
     public void Serialized<T>(byte[] bytes, T data, ref int index) where T : BaseSerialized
     {
-        byte[] dataBytes = data.GetBytes();
+        byte[] dataBytes = data.Writing();
         dataBytes.CopyTo(bytes, index);
         index += dataBytes.Length;
     }

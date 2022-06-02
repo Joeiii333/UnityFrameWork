@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,7 +40,7 @@ public class NetTest : MonoBehaviour
         {
             BaseMessage message = new BaseMessage(p);
             byte[] bytes = message.GetMessagePacket();
-            NetMgr.Instance.Send(message);
+            NetMgr.Instance.SendTest(bytes);
             print("发送数据");
         });
         
@@ -48,7 +49,13 @@ public class NetTest : MonoBehaviour
         {
             BaseMessage message = new BaseMessage(p);
             byte[] bytes = message.GetMessagePacket();
-            NetMgr.Instance.SendTest(bytes);
+            byte[] bytes1 = new byte[20];
+            byte[] bytes2 = new byte[30];
+            Array.Copy(bytes,0,bytes1,0,20);
+            Array.Copy(bytes,20,bytes2,0,30);
+            NetMgr.Instance.SendTest(bytes1);
+            NetMgr.Instance.SendTest(bytes2);
+            print("发送分包数据");
         });
         
         //黏包
@@ -59,10 +66,10 @@ public class NetTest : MonoBehaviour
             
             BaseMessage message2 = new BaseMessage(p2);
             message2.classID = 2000;
-            byte[] bytes2 = message.GetMessagePacket();
+            byte[] bytes2 = message2.GetMessagePacket();
             
             byte[] bytes3 = new byte[message.GetMessageLength() + message2.GetMessageLength()];
-            
+
             bytes.CopyTo(bytes3,0);
             bytes2.CopyTo(bytes3,message.GetMessageLength());
             
@@ -74,15 +81,21 @@ public class NetTest : MonoBehaviour
         btn4.onClick.AddListener(() =>
         {
             BaseMessage message = new BaseMessage(p);
-            byte[] bytes = message.GetMessagePacket();
-            NetMgr.Instance.SendTest(bytes);
+            BaseMessage message2 = new BaseMessage(p2);
+            byte[] packet1 = message.GetMessagePacket();
+            byte[] packet2 = message2.GetMessagePacket();
+            byte[] bytes1 = new byte[20];
+            byte[] bytes2 = new byte[81];
+            Array.Copy(packet1,0,bytes1,0,20);
+            Array.Copy(packet1,20,bytes2,0,30);
+            Array.Copy(packet2,0,bytes2,30,51);
+            NetMgr.Instance.SendTest(bytes1);
+            NetMgr.Instance.SendTest(bytes2);
         });
+        
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
+
 
     void ConnetServer()
     {

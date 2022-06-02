@@ -29,22 +29,34 @@ public class NetMgr : MonoBehaviour
     //是否连接
     private bool isConnected = false;
 
+    //发送心跳消息的间隔时间
+    private int SEND_HEART_MSG_TIME = 3;
+    private BaseMessage heartMsg = new BaseMessage(new HeartMessage());
+
     void Awake()
     {
         Init();
+        //定时发送心跳消息
+        InvokeRepeating("SendHeartMsg", 0, SEND_HEART_MSG_TIME);
     }
 
     // Update is called once per frame
     void Update()
     {
         if (isConnected && receiver.GetReceiverQueueCount() > 0)
-            receiver.ParseMessage();
-    }
+            receiver.HandleMessage();
+    } 
 
     private void Init()
     {
         instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void SendHeartMsg()
+    {
+        if (isConnected)
+            Send(heartMsg);
     }
 
     public void Connet(string ip, int port)
@@ -62,7 +74,6 @@ public class NetMgr : MonoBehaviour
             socket.Connect(ipPoint);
             isConnected = true;
             print("连接成功");
-            Console.WriteLine("111");
             //开启发送线程
             sender = MessageSender.Instance.StartUp(socket);
             //开启接收线程
@@ -86,15 +97,21 @@ public class NetMgr : MonoBehaviour
     //用于测试，直接发送字节数组的方法
     public void SendTest(byte[] bytes)
     {
-        // sender.SendMessage();
+        sender.SendMessageTest(bytes);
     }
 
     public void Close()
     {
         if (socket != null)
         {
+            // print("客户端主动断开连接");
+            // BaseMessage message = new BaseMessage(new QuitMessage());
+            // socket.Send(message.GetMessagePacket());
+
             socket.Shutdown(SocketShutdown.Both);
+            // socket.Disconnect(false);    //不太准
             socket.Close();
+            socket = null;
 
             isConnected = false;
         }

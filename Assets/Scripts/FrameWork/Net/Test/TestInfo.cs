@@ -56,7 +56,7 @@ public class Person : BaseSerialized
         return index - beginIndex;
     }
 
-    public override byte[] GetBytes()
+    public override byte[] Writing()
     {
         int index = 0;
         byte[] bytes = new byte[GetLength()];
@@ -73,7 +73,7 @@ public class PlayerInfo : BaseSerialized
 {
     public int lv;
 
-    public override byte[] GetBytes()
+    public override byte[] Writing()
     {
         int index = 0;
         byte[] bytes = new byte[GetLength()];

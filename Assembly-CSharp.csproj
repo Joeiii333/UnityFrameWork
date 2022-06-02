@@ -71,10 +71,11 @@
      <Compile Include="Assets\Scripts\FrameWork\Mono\MonoController.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Mono\MonoManager.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Mono\Test\MonoTest.cs" />
-     <Compile Include="Assets\Scripts\FrameWork\Net\Core\BaseMessage.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Core\MessageReceiver.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Core\MessageSender.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Core\NetMgr.cs" />
+     <Compile Include="Assets\Scripts\FrameWork\Net\Message\BaseMessage.cs" />
+     <Compile Include="Assets\Scripts\FrameWork\Net\Message\SpeicalMessage.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Serialized\BaseSerialized.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Test\NetTest.cs" />
      <Compile Include="Assets\Scripts\FrameWork\Net\Test\TestInfo.cs" />
@@ -88,12 +89,6 @@
      <Compile Include="Assets\Scripts\FrameWork\UI\Test\LoginPanel.cs" />
      <Compile Include="Assets\Scripts\FrameWork\UI\Test\UITest.cs" />
      <Compile Include="Assets\Scripts\FrameWork\UI\UIManager.cs" />
-     <Compile Include="Assets\Scripts\Server\BaseMessage.cs" />
-     <Compile Include="Assets\Scripts\Server\BaseSerialized.cs" />
-     <Compile Include="Assets\Scripts\Server\ClientSocket.cs" />
-     <Compile Include="Assets\Scripts\Server\Person.cs" />
-     <Compile Include="Assets\Scripts\Server\Program.cs" />
-     <Compile Include="Assets\Scripts\Server\ServerSocket.cs" />
      <Compile Include="Assets\Scripts\Test\SpriteTest.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/Unity/Project/unity-frame-work/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

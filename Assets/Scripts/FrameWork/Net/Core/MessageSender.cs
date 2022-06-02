@@ -41,4 +41,9 @@ public class MessageSender
     {
         sendQueue.Enqueue(msg);
     }
+
+    public void SendMessageTest(byte[] bytes)
+    {
+        socket.Send(bytes);
+    }
 }

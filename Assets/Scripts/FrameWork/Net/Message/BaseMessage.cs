@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class BaseMessage
 {
-    // public int messageLength;
     public int classID;
     public BaseSerialized messageData;
-    private int messageLength;
+
+    private int messageLength { get; set; }
 
     public BaseMessage()
     {
@@ -28,17 +28,18 @@ public class BaseMessage
     public byte[] GetMessagePacket()
     {
         int index = 0;
-        int length = messageData.GetLength() + 8;            //因为后续还要加上classID和长度标识，所以需要+8；
-        messageLength = length;
+        int dataLength = messageData.GetLength() + 4; //因为后续还要加上classID，所以需要+4  !!!!这里要注意，长度是指数据长度，不包含长度标识
+        messageLength = dataLength + 4; //这里+4是为了生成字节数组时把长度加上,这里相当于是实际的字节数组长度
 
-        byte[] bytes = new byte[length];
-        byte[] data = messageData.GetBytes();
-        
-        BitConverter.GetBytes(length).CopyTo(bytes, index);
+        byte[] bytes = new byte[messageLength];
+        byte[] data = messageData.Writing();
+
+        BitConverter.GetBytes(dataLength).CopyTo(bytes, index);
         index += 4;
         BitConverter.GetBytes(classID).CopyTo(bytes, index);
         index += 4;
         data.CopyTo(bytes, index);
+        MonoBehaviour.print(bytes.Length);
         return bytes;
     }
 

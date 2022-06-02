@@ -121,22 +121,32 @@ public class MessageReceiver
 
     private BaseSerialized ParseClassByID(byte[] bytes, int nowIndex, int classID)
     {
+        BaseSerialized temp = null;
         switch (classID)
         {
             case 1000:
-                Person p = new Person();
-                p.Reading(bytes, nowIndex);
-                return p;
+                temp = new Person();
+                temp.Reading(bytes, nowIndex);
+                return temp;
             default:
                 //解析失败
                 MonoBehaviour.print("处理数据解析失败，classID:" + classID);
-                return null;
+                return temp;
         }
     }
 
-    public void ParseMessage()
+    public void HandleMessage()
     {
-        //分发消息，classID和data都已经解析出来了
+        //分发消息，classID和data都已经解析出来了在队列中
+        while (receiverQueue.Count > 0)
+        {
+            BaseMessage msg = receiverQueue.Dequeue();
+            if (msg.messageData is Person p)
+            {
+                //执行逻辑
+                
+            }
+        }
     }
 
     public int GetReceiverQueueCount()
