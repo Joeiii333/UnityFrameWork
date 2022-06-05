@@ -101,4 +101,5 @@ public class NetTest : MonoBehaviour
     {
         NetMgr.Instance.Connet("127.0.0.1",8080);
     }
+
 }
